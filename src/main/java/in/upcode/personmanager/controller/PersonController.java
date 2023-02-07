@@ -49,5 +49,11 @@ public class PersonController {
         return personService.updateAndSavePerson(id, person);
     }
 
+    @DeleteMapping(value = "/{id}")
+    ResponseEntity deleteAPerson(@PathVariable("id") Integer id){
+        personRepository.deleteById(id);
+
+        return ResponseEntity.noContent().build();
+    }
 
 }
