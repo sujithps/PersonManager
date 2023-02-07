@@ -1,0 +1,21 @@
+version: '3'
+services:
+  db:
+    image: postgres:12.9
+    environment:
+      POSTGRES_USER: bob
+      POSTGRES_PASSWORD: bob123
+      POSTGRES_DB: demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:
+    driver: local
+
+
+
+
+
+        
