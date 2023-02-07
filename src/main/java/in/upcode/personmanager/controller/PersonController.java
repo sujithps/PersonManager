@@ -6,7 +6,9 @@ import in.upcode.personmanager.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +23,8 @@ public class PersonController {
     // Delete /api/person/{id} -> Delete a single person with the given ID
 
     // GET /api/person?name={name} -> List of person with the given name
+
+    //POST /api/person body -> Create a new person in the DB with the given data
 
     @Autowired
     PersonRepository personRepository;
@@ -50,10 +54,18 @@ public class PersonController {
     }
 
     @DeleteMapping(value = "/{id}")
-    ResponseEntity deleteAPerson(@PathVariable("id") Integer id){
+    ResponseEntity deleteAPerson(@PathVariable("id") Integer id) {
         personRepository.deleteById(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping
+    ResponseEntity createAPerson(@RequestBody Person person, UriComponentsBuilder uriComponentsBuilder) {
+        final Person createdPerson = personRepository.save(person);
+
+        final URI location = uriComponentsBuilder.path("/api/person/{id}").buildAndExpand(createdPerson.getId()).toUri();
+        return ResponseEntity.created(location).body(createdPerson);
     }
 
 }
