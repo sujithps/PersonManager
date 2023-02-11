@@ -13,18 +13,18 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/person")
+@RequestMapping("/api/persons")
 public class PersonController {
 
-    // GET /api/person  -> List of all persons
-    // GET /api/person/{id} -> A Single Person details with the given ID
+    // GET /api/persons  -> List of all persons
+    // GET /api/persons/{id} -> A Single Person details with the given ID
 
-    // PUT /api/person/{id} body -> Update a single Person details with the given ID, by the given data
-    // Delete /api/person/{id} -> Delete a single person with the given ID
+    // PUT /api/persons/{id} body -> Update a single Person details with the given ID, by the given data
+    // Delete /api/persons/{id} -> Delete a single person with the given ID
 
-    // GET /api/person?name={name} -> List of person with the given name
+    // GET /api/persons?name={name} -> List of person with the given name
 
-    //POST /api/person body -> Create a new person in the DB with the given data
+    //POST /api/persons body -> Create a new person in the DB with the given data
 
     @Autowired
     PersonRepository personRepository;
@@ -48,6 +48,11 @@ public class PersonController {
         return ResponseEntity.badRequest().body("Could not find any person!!");
     }
 
+    @GetMapping("/{id}/cars")
+    ResponseEntity getAllCarsOwnedByAPerson(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok(personService.getAllCarOwnedBy(id));
+    }
+
     @PutMapping(value = "/{id}")
     ResponseEntity updateAPersonWithID(@PathVariable("id") Integer id, @RequestBody Person person) {
         return personService.updateAndSavePerson(id, person);
@@ -62,9 +67,12 @@ public class PersonController {
 
     @PostMapping
     ResponseEntity createAPerson(@RequestBody Person person, UriComponentsBuilder uriComponentsBuilder) {
+        if (person.getOwnedCars() != null)
+            person.getOwnedCars().forEach(car -> car.setOwner(person));
+
         final Person createdPerson = personRepository.save(person);
 
-        final URI location = uriComponentsBuilder.path("/api/person/{id}").buildAndExpand(createdPerson.getId()).toUri();
+        final URI location = uriComponentsBuilder.path("/api/persons/{id}").buildAndExpand(createdPerson.getId()).toUri();
         return ResponseEntity.created(location).body(createdPerson);
     }
 
